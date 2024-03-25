@@ -49,12 +49,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 
-data class ImageInfo(
-    val resourceId: Int,
-    val author: String,
-    val date: String,
-    val description: String
-)
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,12 +66,13 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "screen1") {
                         composable("screen1") { Screen1(navController,imageViewModel) }
                         composable(
-                            route = "screen2/{Description}",
+                            route = "screen2/{Description}/{Titre}",
                             arguments = listOf(navArgument("Description") { type = NavType.StringType })
                         ) { backStackEntry ->
                             Screen2(
                                 navController,
-                                Description = backStackEntry.arguments?.getString("Description") ?: ""
+                                Description = backStackEntry.arguments?.getString("Description") ?: "",
+                                Titre = backStackEntry.arguments?.getString("Titre") ?: ""
                             )
                         }
                     }
@@ -138,7 +134,7 @@ fun Screen1(navController: NavHostController,imageViewModel: ImageViewModel) {
             )
             {
                 Text(
-                    text = "Auteur: ${currentImage.author}",
+                    text = currentImage.author,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
@@ -149,7 +145,7 @@ fun Screen1(navController: NavHostController,imageViewModel: ImageViewModel) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Date d'apparition: ${currentImage.date}",
+                    text = currentImage.date,
                     style = TextStyle(
                         color = Color.Black,
                         fontSize = 18.sp
@@ -175,7 +171,7 @@ fun Screen1(navController: NavHostController,imageViewModel: ImageViewModel) {
                 )
             }
             Button(
-                onClick = { navController.navigate("screen2/${currentImage.description}") },
+                onClick = { navController.navigate("screen2/${currentImage.description}/${currentImage.author}") },
                 colors = ButtonDefaults.buttonColors(Color.Transparent)
             ) {
                 Text(
@@ -208,16 +204,39 @@ fun Screen1(navController: NavHostController,imageViewModel: ImageViewModel) {
 }
 
 @Composable
-fun Screen2(navController: NavHostController, Description: String) {
-    Column(
+fun Screen2(navController: NavHostController, Description: String, Titre: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Screen 2", style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Description de l'image: $Description", style = MaterialTheme.typography.bodyMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+        Text (
+            text = Titre,
+            style = TextStyle(
+                fontSize = 25.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        )
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Box(
+            modifier = Modifier
+                .height(250.dp)
+                .width(350.dp)
+                .background(Color(0xFF6495ED).copy(alpha = 0.5f)) // Couleur bleue claire avec transparence
+                .padding(16.dp)
+        )
+        {
+            Text(
+                text = Description,
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+        Spacer(modifier = Modifier.height(50.dp))
         Button(onClick = { navController.navigate("screen1") }) {
             Text(
                 "Go Back",
